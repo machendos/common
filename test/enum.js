@@ -19,8 +19,8 @@ api.metatests.test('Enum with key/value', (test) => {
   });
 
   test.strictSame(typeof(Month), 'function');
-  test.strictSame(typeof(Month.collection), 'object');
-  test.strictSame(Array.isArray(Month.collection), false);
+  test.strictSame(typeof(Month.values), 'object');
+  test.strictSame(Array.isArray(Month.values), false);
 
   test.strictSame(Month.has('May'), true);
   test.strictSame(Month.key('August'), 'Aug');
@@ -36,15 +36,15 @@ api.metatests.test('Enum with key/value', (test) => {
   test.end();
 });
 
-api.metatests.test('Enum string keys', (test) => {
+api.metatests.test('Enum string month keys', (test) => {
   const Month = Enum.from(
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
   );
 
   test.strictSame(typeof(Month), 'function');
-  test.strictSame(typeof(Month.collection), 'object');
-  test.strictSame(Array.isArray(Month.collection), false);
+  test.strictSame(typeof(Month.values), 'object');
+  test.strictSame(Array.isArray(Month.values), false);
 
   test.strictSame(Month.has('May'), true);
   test.strictSame(Month.has('Aug'), false);
@@ -55,14 +55,16 @@ api.metatests.test('Enum string keys', (test) => {
   test.strictSame(Month.has('May'), true);
   test.strictSame(may.value, '4');
 
+  test.strictSame(may, Month.from('May'));
+
   test.strictSame(+may, 4);
-  test.strictSame(may + '', 'May');
+  test.strictSame(may + '', '4');
 
   test.end();
 });
 
-api.metatests.test('Enum string keys', (test) => {
-  const Month  = Enum.from({
+api.metatests.test('Enum string month typed keys', (test) => {
+  const Month = Enum.from({
     1: 'January',
     2: 'February',
     3: 'March',
@@ -78,8 +80,8 @@ api.metatests.test('Enum string keys', (test) => {
   });
 
   test.strictSame(typeof(Month), 'function');
-  test.strictSame(typeof(Month.collection), 'object');
-  test.strictSame(Array.isArray(Month.collection), false);
+  test.strictSame(typeof(Month.values), 'object');
+  test.strictSame(Array.isArray(Month.values), false);
 
   test.strictSame(Month.has('May'), true);
   test.strictSame(Month.has('Aug'), false);
@@ -90,48 +92,51 @@ api.metatests.test('Enum string keys', (test) => {
   test.strictSame(Month.has('May'), true);
   test.strictSame(may.value, '5');
 
+  test.strictSame(may, Month.from('May'));
+
   test.strictSame(+may, 5);
-  test.strictSame(may + '', 'May');
+  test.strictSame(may + '', '5');
 
   test.end();
 });
 
-api.metatests.test('Enum string keys', (test) => {
+api.metatests.test('Enum hundreds keys', (test) => {
   const Hundreds = Enum.from(100, 200, 300, 400, 500);
 
-  const neg = new Hundreds(-1);
-  const zero = new Hundreds(0);
   const h100 = new Hundreds(100);
   const h200 = new Hundreds(200);
   const h500 = new Hundreds(500);
-  const h600 = new Hundreds(600);
-  const unknown = new Hundreds('Hello');
+
+  const errorMessage =
+    (val) => `No such enum value ${val}, valid values: 100,200,300,400,500`;
+  test.throws(() => new Hundreds(-1), new TypeError(errorMessage(-1)));
+  test.throws(() => new Hundreds(0), new TypeError(errorMessage(0)));
+  test.throws(() => new Hundreds(600), new TypeError(errorMessage(600)));
+  test.throws(
+    () => new Hundreds('Hello'),
+    new TypeError(errorMessage('Hello'))
+  );
 
   test.strictSame(typeof(Hundreds), 'function');
-  test.strictSame(typeof(Hundreds.collection), 'object');
-  test.strictSame(Array.isArray(Hundreds.collection), true);
-  test.strictSame(Hundreds.collection.length, 5);
+  test.strictSame(typeof(Hundreds.values), 'object');
+  test.strictSame(Array.isArray(Hundreds.values), true);
+  test.strictSame(Hundreds.values.length, 5);
 
-  test.strictSame(+neg, NaN);
-  test.strictSame(neg + '', 'undefined');
+  test.strictSame(+h100, 0);
+  test.strictSame(h100 + '', '0');
+  test.strictSame(h100.keyValue, 100);
 
-  test.strictSame(+zero, NaN);
-  test.strictSame(zero + '', 'undefined');
+  test.strictSame(+h200, 1);
+  test.strictSame(h200 + '', '1');
+  test.strictSame(h200.keyValue, 200);
 
-  test.strictSame(+h100, 100);
-  test.strictSame(h100 + '', '100');
+  test.strictSame(+h500, 4);
+  test.strictSame(h500 + '', '4');
+  test.strictSame(h500.keyValue, 500);
 
-  test.strictSame(+h200, 200);
-  test.strictSame(h200 + '', '200');
-
-  test.strictSame(+h500, 500);
-  test.strictSame(h500 + '', '500');
-
-  test.strictSame(+h600, NaN);
-  test.strictSame(h600 + '', 'undefined');
-
-  test.strictSame(+unknown, NaN);
-  test.strictSame(unknown + '', 'undefined');
+  test.strictSame(h100, Hundreds.from(100));
+  test.strictSame(h200, Hundreds.from(200));
+  test.strictSame(h500, Hundreds.from(500));
 
   test.end();
 });
